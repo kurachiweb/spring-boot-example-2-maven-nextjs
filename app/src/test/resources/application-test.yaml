@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: atamishare-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
+  mail:
+    host: localhost
+    port: 25
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+jwt:
+  secret: test-secret-key-for-testing-purposes-only-do-not-use-in-production-environment
+  access-token-expiration: 900000 # 15分
+  refresh-token-expiration: 604800000 # 7日
+
+aws:
+  ses:
+    region: ap-northeast-1
+    access-key: test-access-key
+    secret-key: test-secret-key
+    from-email: test@example.com
+
+app:
+  cors:
+    allowed-origins: http://localhost:3000
+  storage:
+    type: local
+    local-path: /tmp/uploads
+    storage-base-url: http://localhost:8080
+  frontend-url: http://localhost:3000
+  email:
+    from: test@example.com
+    from-name: AtamiShare Test

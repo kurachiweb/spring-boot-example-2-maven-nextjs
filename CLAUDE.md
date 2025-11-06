@@ -1,8 +1,10 @@
-# 単文投稿サービス「AtamiShare」開発要件
+# 短文投稿サービス「AtamiShare」開発要件
+
+日本語で回答して、コード内のコメントも日本語で書いてください。
 
 ## プロジェクト概要
 
-Next.js（フロントエンド）+ Spring Boot（バックエンド API）+ MySQL（データベース）を使用したソーシャルメディア型単文投稿 Web アプリケーション
+Next.js（フロントエンド）+ Spring Boot（バックエンド API）+ MySQL（データベース）を使用したソーシャルメディア型短文投稿 Web アプリケーション
 
 ## 公開予定ドメイン
 
@@ -37,7 +39,7 @@ https://atami-share.jp
 
 ## 開発時に使うポート
 
-- **データベース**: 55031
+- **データベース**: 3306
 - **バックエンド API**: 55032
 - **フロントエンド**: 55033
 
@@ -405,7 +407,7 @@ CREATE TABLE password_reset_tokens (
 - パスワード確認入力
 - 保存ボタン
 
-### 6. 公開プロフィールページ `/[username]`
+### 6. 公開プロフィールページ `/@[username]`
 
 - プロフィール情報表示
 - 投稿一覧（無限スクロール）
@@ -426,6 +428,13 @@ CREATE TABLE password_reset_tokens (
 - 投稿内容表示
 - 返信一覧
 - 返信フォーム（ログイン時のみ）
+
+### 9. サービス概要ページ `/about`
+
+- AtamiShareの説明
+- 主な機能の紹介
+- 新規登録・ログインへのリンク
+- 誰でも閲覧可能（認証不要）
 
 ---
 
@@ -454,117 +463,32 @@ CREATE TABLE password_reset_tokens (
 
 ## プロジェクト構成の検討案
 
-### バックエンド（Spring Boot）
-
 ```
-backend/
-├── src/main/java/com/example/socialapp/
-│   ├── SocialAppApplication.java
-│   ├── config/
-│   │   ├── SecurityConfig.java
-│   │   ├── CorsConfig.java
-│   │   ├── AwsSesConfig.java
-│   │   └── JwtConfig.java
-│   ├── entity/
-│   │   ├── User.java
-│   │   ├── Post.java
-│   │   ├── Like.java
-│   │   ├── Follow.java
-│   │   └── PasswordResetToken.java
-│   ├── repository/
-│   │   ├── UserRepository.java
-│   │   ├── PostRepository.java
-│   │   ├── LikeRepository.java
-│   │   ├── FollowRepository.java
-│   │   └── PasswordResetTokenRepository.java
-│   ├── service/
-│   │   ├── AuthService.java
-│   │   ├── UserService.java
-│   │   ├── PostService.java
-│   │   ├── LikeService.java
-│   │   ├── FollowService.java
-│   │   ├── EmailService.java
-│   │   ├── JwtService.java
-│   │   └── StorageService.java
-│   ├── controller/
-│   │   ├── AuthController.java
-│   │   ├── UserController.java
-│   │   ├── PostController.java
-│   │   ├── LikeController.java
-│   │   └── FollowController.java
-│   ├── dto/
-│   │   ├── request/
-│   │   └── response/
-│   ├── security/
-│   │   ├── JwtAuthenticationFilter.java
-│   │   └── CustomUserDetailsService.java
-│   └── exception/
-│       ├── GlobalExceptionHandler.java
-│       └── CustomExceptions.java
-├── src/main/resources/
-│   ├── application.properties
-│   └── application-prod.properties
-└── pom.xml
-```
-
-### フロントエンド（Next.js）
-
-```
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx (トップページ)
-│   │   ├── login/
-│   │   │   └── page.tsx
-│   │   ├── register/
-│   │   │   └── page.tsx
-│   │   ├── password-reset/
-│   │   │   ├── page.tsx
-│   │   │   └── [token]/page.tsx
-│   │   ├── [username]/
-│   │   │   └── page.tsx
-│   │   ├── posts/
-│   │   │   └── [postId]/page.tsx
-│   │   └── settings/
-│   │       └── profile/page.tsx
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── Header.tsx
-│   │   │   └── Footer.tsx
-│   │   ├── post/
-│   │   │   ├── PostCard.tsx
-│   │   │   ├── PostForm.tsx
-│   │   │   ├── PostList.tsx
-│   │   │   └── ReplyList.tsx
-│   │   ├── user/
-│   │   │   ├── ProfileCard.tsx
-│   │   │   ├── ProfileEditForm.tsx
-│   │   │   └── FollowButton.tsx
-│   │   └── common/
-│   │       ├── Button.tsx
-│   │       ├── Input.tsx
-│   │       └── LoadingSpinner.tsx
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useInfiniteScroll.ts
-│   │   └── useDebounce.ts
-│   ├── lib/
-│   │   ├── api.ts (Axios instance)
-│   │   ├── auth.ts
-│   │   └── utils.ts
-│   ├── types/
-│   │   ├── user.ts
-│   │   ├── post.ts
-│   │   └── api.ts
-│   └── styles/
-│       └── globals.css
-├── public/
-│   └── images/
-├── package.json
-├── tsconfig.json
-├── tailwind.config.ts
-└── next.config.js
+spring-boot-demo-2-maven-nextjs/
+├── app/                          # Spring Boot バックエンド
+│   ├── src/main/java/com/example/demo/
+│   │   ├── config/              # 設定クラス
+│   │   ├── controller/          # REST コントローラー
+│   │   ├── dto/                 # Data Transfer Objects
+│   │   ├── entity/              # JPA エンティティ
+│   │   ├── exception/           # 例外ハンドラー
+│   │   ├── repository/          # JPA リポジトリ
+│   │   ├── security/            # JWT・認証関連
+│   │   └── service/             # ビジネスロジック
+│   ├── src/main/resources/
+│   │   └── application.yaml     # アプリケーション設定
+│   └── pom.xml                  # Maven依存関係
+│
+└── web/                          # Next.js フロントエンド
+    ├── src/
+    │   ├── app/                 # Next.js App Router ページ
+    │   ├── components/          # React コンポーネント
+    │   ├── hooks/               # カスタムフック
+    │   ├── lib/                 # ユーティリティ・API クライアント
+    │   ├── store/               # 状態管理
+    │   └── types/               # TypeScript 型定義
+    ├── .env.local              # 環境変数
+    └── package.json            # npm 依存関係
 ```
 
 ---

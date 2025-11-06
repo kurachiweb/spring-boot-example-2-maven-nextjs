@@ -1,5 +1,51 @@
+server:
+  port: ${PORT_APP:55032}
+
 spring:
   application:
-    name: spring-boot-nextjs-demo
-  devtools:
-    port: 55034
+    name: atamishare
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/atamishare_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8}
+    username: ${DATABASE_USER_NAME:root}
+    password: ${DATABASE_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
+jwt:
+  secret: b0426051adede60252f6fffd7b27ca7e1e13fa32a97c084a2da0ad13652ec426c2158c9c03393963464a2c9c465ffda60089a
+  access-token-expiration: 900000 # 15分
+  refresh-token-expiration: 604800000 # 7日
+
+aws:
+  ses:
+    region: ${AWS_SES_REGION:ap-northeast-1}
+    access-key: ${AWS_SES_ACCESS_KEY:dummy-access-key}
+    secret-key: ${AWS_SES_SECRET_KEY:dummy-secret-key}
+    from-email: ${EMAIL_FROM:noreply@atami-share.jp}
+
+app:
+  cors:
+    allowed-origins: http://localhost:${PORT_WEB:55033},https://atami-share.jp
+  storage:
+    type: local # local or s3
+    local-path: ${STORAGE_LOCAL_PATH:./uploads}
+    storage-base-url: ${STORAGE_BASE_URL:http://localhost:55032}
+  frontend-url: ${FRONTEND_URL:http://localhost:55033}
+  email:
+    from: ${EMAIL_FROM:noreply@atami-share.jp}
+    from-name: ${EMAIL_FROM_NAME:AtamiShare}
+    # s3-bucket-name: atamishare-uploads
