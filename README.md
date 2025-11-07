@@ -51,6 +51,8 @@ Next.js 15 + Spring Boot 3.5.7 + MySQL で構築されたソーシャルメデ�
 ```
 spring-boot-demo-2-maven-nextjs/
 ├── app/                          # Spring Boot バックエンド
+│   ├── config/
+│   │   └── secret/              # 環境変数の代わりとなる上書き設定ファイル
 │   ├── src/main/java/com/example/demo/
 │   │   ├── config/              # 設定クラス
 │   │   ├── controller/          # REST コントローラー

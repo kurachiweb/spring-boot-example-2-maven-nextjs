@@ -1,14 +1,14 @@
 server:
-  port: ${PORT_APP:55032}
+  port: ${PORT_APP:80}
 
 spring:
   application:
     name: atamishare
 
   datasource:
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/atamishare_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tokyo&characterEncoding=UTF-8}
-    username: ${DATABASE_USER_NAME:root}
-    password: ${DATABASE_PASSWORD:password}
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER_NAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -32,20 +32,20 @@ jwt:
 
 aws:
   ses:
-    region: ${AWS_SES_REGION:ap-northeast-1}
-    access-key: ${AWS_SES_ACCESS_KEY:dummy-access-key}
-    secret-key: ${AWS_SES_SECRET_KEY:dummy-secret-key}
-    from-email: ${EMAIL_FROM:noreply@atami-share.jp}
+    region: ${AWS_SES_REGION}
+    access-key: ${AWS_SES_ACCESS_KEY}
+    secret-key: ${AWS_SES_SECRET_KEY}
+    from-email: ${EMAIL_FROM}
 
 app:
   cors:
-    allowed-origins: http://localhost:${PORT_WEB:55033},https://atami-share.jp
+    allowed-origins: http://localhost:${PORT_WEB},https://atami-share.jp
   storage:
-    type: local # local or s3
-    local-path: ${STORAGE_LOCAL_PATH:./uploads}
-    storage-base-url: ${STORAGE_BASE_URL:http://localhost:55032}
-  frontend-url: ${FRONTEND_URL:http://localhost:55033}
+    type: s3 # local or s3
+    local-path: ${STORAGE_LOCAL_PATH}
+    storage-base-url: ${STORAGE_BASE_URL}
+  frontend-url: ${FRONTEND_URL}
   email:
-    from: ${EMAIL_FROM:noreply@atami-share.jp}
-    from-name: ${EMAIL_FROM_NAME:AtamiShare}
+    from: ${EMAIL_FROM}
+    from-name: AtamiShare
     # s3-bucket-name: atamishare-uploads
