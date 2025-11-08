@@ -9,6 +9,7 @@ import com.example.demo.repository.LikeRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +29,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
+    @Value("${aws.region}")
+    private String region;
 
     /**
      * 投稿を作成
@@ -198,12 +205,21 @@ public class PostService {
      * 投稿をレスポンスDTOに変換（いいね状態を指定）
      */
     private PostResponse convertToResponse(Post post, boolean isLikedByCurrentUser) {
+        // プロフィール画像URLを生成
+        String profileImageUrl = null;
+        if (post.getUser().getProfileImageUrl() != null && !post.getUser().getProfileImageUrl().isEmpty()) {
+            // DBにはファイル名のみが保存されているため、完全なURLを生成
+            // 例: https://my-bucket.s3.ap-northeast-1.amazonaws.com/profiles/1/05c1cbbc-91c6-4dcf-9ff8-2291a27a8190.jpg
+            profileImageUrl = String.format("https://%s.s3.%s.amazonaws.com/profiles/%d/%s",
+                    bucketName, region, post.getUser().getId(), post.getUser().getProfileImageUrl());
+        }
+
         return PostResponse.builder()
                 .id(post.getId())
                 .content(post.getContent())
                 .userId(post.getUser().getId())
                 .username(post.getUser().getUsername())
-                .userProfileImageUrl(post.getUser().getProfileImageUrl())
+                .userProfileImageUrl(profileImageUrl)
                 .parentPostId(post.getParentPost() != null ? post.getParentPost().getId() : null)
                 .likesCount((long) post.getLikesCount())
                 .repliesCount((long) post.getRepliesCount())

@@ -31,21 +31,25 @@ jwt:
   refresh-token-expiration: 604800000 # 7日
 
 aws:
+  region: ${AWS_REGION:ap-northeast-1}
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
   ses:
-    region: ${AWS_SES_REGION}
-    access-key: ${AWS_SES_ACCESS_KEY}
-    secret-key: ${AWS_SES_SECRET_KEY}
+    region: ${AWS_SES_REGION:${AWS_REGION:ap-northeast-1}}
+    access-key: ${AWS_SES_ACCESS_KEY:${AWS_ACCESS_KEY}}
+    secret-key: ${AWS_SES_SECRET_KEY:${AWS_SECRET_KEY}}
     from-email: ${EMAIL_FROM}
+  s3:
+    bucket-name: ${AWS_S3_BUCKET}
 
 app:
   cors:
     allowed-origins: http://localhost:${PORT_WEB},https://atami-share.jp
   storage:
-    type: s3 # local or s3
-    local-path: ${STORAGE_LOCAL_PATH}
+    type: ${STORAGE_TYPE:s3} # local or s3
+    local-path: ${STORAGE_LOCAL_PATH:/tmp/uploads}
     storage-base-url: ${STORAGE_BASE_URL}
   frontend-url: ${FRONTEND_URL}
   email:
     from: ${EMAIL_FROM}
     from-name: AtamiShare
-    # s3-bucket-name: atamishare-uploads

@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -12,21 +13,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+/**
+ * ローカルストレージサービス
+ * - app.storage.type=localの場合に使用される
+ * - ローカルファイルシステムに画像を保存
+ * - ファイル名のみを返す（URL生成はDTOで行う）
+ */
 @Slf4j
 @Service
-public class StorageService {
+@ConditionalOnProperty(name = "app.storage.type", havingValue = "local")
+public class LocalStorageService implements IStorageService {
 
-    @Value("${app.storage.local-path:./uploads}")
+    @Value("${app.storage.local-path:/tmp/uploads}")
     private String storagePath;
 
-    @Value("${app.storage.storage-base-url:http://localhost:55032}")
+    @Value("${app.storage.storage-base-url}")
     private String storageBaseUrl;
 
     /**
      * プロフィール画像を保存
      * - ローカルストレージにファイルを保存
-     * - 画像のURL パスを返す
+     * - ファイル名のみを返す（例: 05c1cbbc-91c6-4dcf-9ff8-2291a27a8190.jpg）
      */
+    @Override
     public String saveProfileImage(Long userId, byte[] imageData, String originalFilename) {
         try {
             // ディレクトリ構造を作成
@@ -43,8 +52,9 @@ public class StorageService {
 
             log.info("Profile image saved for user {}: {}", userId, filePath);
 
-            // URL パスを返す（例: /profiles/{userId}/{filename}）
-            return "/profiles/" + userId + "/" + filename;
+            // ファイル名のみを返す（DBに保存される）
+            // URL生成はUserResponseで行う
+            return filename;
         } catch (IOException e) {
             log.error("Failed to save profile image for user {}", userId, e);
             throw new RuntimeException("Failed to save image", e);
@@ -53,15 +63,18 @@ public class StorageService {
 
     /**
      * ローカルストレージからファイルを削除
+     * @param userId ユーザーID
+     * @param filename ファイル名（例: 05c1cbbc-91c6-4dcf-9ff8-2291a27a8190.jpg）
      */
-    public void deleteFile(String filePath) {
+    @Override
+    public void deleteFile(Long userId, String filename) {
         try {
-            if (filePath == null || filePath.isEmpty()) {
+            if (filename == null || filename.isEmpty()) {
                 return;
             }
 
-            // URL パスの場合は、ローカルパスに変換
-            String localPath = storagePath + filePath;
+            // ローカルパスを生成: {storagePath}/profiles/{userId}/{filename}
+            String localPath = storagePath + "/profiles/" + userId + "/" + filename;
 
             File file = new File(localPath);
             if (file.exists()) {
@@ -72,7 +85,7 @@ public class StorageService {
                 }
             }
         } catch (Exception e) {
-            log.error("Error deleting file: {}", filePath, e);
+            log.error("Error deleting file (user: {}, file: {})", userId, filename, e);
             // ファイル削除失敗時はエラーをログするが、処理は続行
         }
     }

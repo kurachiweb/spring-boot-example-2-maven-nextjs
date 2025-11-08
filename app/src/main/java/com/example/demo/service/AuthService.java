@@ -12,6 +12,7 @@ import com.example.demo.repository.PasswordResetTokenRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,12 @@ public class AuthService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
+    @Value("${aws.region}")
+    private String region;
 
     /**
      * ユーザー登録処理
@@ -83,7 +90,7 @@ public class AuthService {
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .user(com.example.demo.dto.response.UserResponse.fromEntity(user))
+                .user(com.example.demo.dto.response.UserResponse.fromEntity(user, bucketName, region))
                 .build();
     }
 
@@ -159,7 +166,7 @@ public class AuthService {
 
             return AuthResponse.builder()
                     .accessToken(newAccessToken)
-                    .user(com.example.demo.dto.response.UserResponse.fromEntity(user))
+                    .user(com.example.demo.dto.response.UserResponse.fromEntity(user, bucketName, region))
                     .build();
         } catch (Exception e) {
             throw new CustomExceptions.UnauthorizedException("Invalid refresh token");
