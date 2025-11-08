@@ -1,6 +1,7 @@
 # AtamiShare - 短文投稿 SNS アプリケーション
 
 Next.js 15 + Spring Boot 3.5.7 + MySQL で構築されたソーシャルメディア型短文投稿 Web アプリケーションです。
+Spring Boot と Claude Code を使った練習作品です。
 
 ## 📋 目次
 
